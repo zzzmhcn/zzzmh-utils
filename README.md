@@ -6,6 +6,40 @@
 
 A comprehensive Java 8 utility library providing common functions for database, cache, HTTP, encryption, encoding, file operations and more.
 
+### 📦 Maven Dependency
+
+Add this dependency to your project:
+
+```xml
+<dependency>
+    <groupId>cn.zzzmh.commons</groupId>
+    <artifactId>zzzmh-utils</artifactId>
+    <version>1.0.1</version>
+</dependency>
+```
+
+### 🎯 Optional Dependencies
+
+**For MySQL operations** (only if using MySqlUtils):
+```xml
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version>
+</dependency>
+```
+
+**For Redis operations** (only if using RedisUtils):
+```xml
+<dependency>
+    <groupId>redis.clients</groupId>
+    <artifactId>jedis</artifactId>
+    <version>4.4.6</version>
+</dependency>
+```
+
+> 💡 **Note**: MySQL and Redis dependencies are optional. You only need to add them if you plan to use MySqlUtils or RedisUtils respectively.
+
 ### 📋 Utility Classes
 
 | Tool | Description | Documentation |
@@ -29,6 +63,40 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 ## 中文
 
 基于Java 8的全面工具类库，提供数据库、缓存、HTTP、加密、编码、文件操作等常用功能。
+
+### 📦 Maven依赖
+
+在你的项目中添加以下依赖：
+
+```xml
+<dependency>
+    <groupId>cn.zzzmh.commons</groupId>
+    <artifactId>zzzmh-utils</artifactId>
+    <version>1.0.1</version>
+</dependency>
+```
+
+### 🎯 可选依赖
+
+**MySQL数据库操作** (仅在使用MySqlUtils时需要)：
+```xml
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version>
+</dependency>
+```
+
+**Redis缓存操作** (仅在使用RedisUtils时需要)：
+```xml
+<dependency>
+    <groupId>redis.clients</groupId>
+    <artifactId>jedis</artifactId>
+    <version>4.4.6</version>
+</dependency>
+```
+
+> 💡 **说明**: MySQL和Redis依赖是可选的，只有在使用对应的工具类时才需要添加。如果你不使用MySqlUtils或RedisUtils，可以不添加这些依赖。
 
 ### 📋 工具类目录
 
