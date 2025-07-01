@@ -79,6 +79,34 @@ headers.put("X-API-Key", "your-api-key");
 JSONObject response = HttpUtils.post("https://api.example.com/protected", userData, headers);
 ```
 
+### 🔷 二进制POST请求
+
+```java
+// 请求可能返回二进制数据的API
+JSONObject requestData = new JSONObject();
+requestData.put("fileId", "12345");
+requestData.put("format", "png");
+
+JSONObject headers = new JSONObject();
+headers.put("Authorization", "Bearer your-token");
+
+// 使用postForBinary方法处理可能的二进制响应
+JSONObject response = HttpUtils.postForBinary("https://api.example.com/generate-image", 
+                                             requestData, headers);
+
+// 智能处理响应
+if (response.getBooleanValue("isBinary")) {
+    // 处理二进制响应（如生成的图片）
+    String base64Image = response.getString("base64");
+    String contentType = response.getString("contentType");
+    System.out.println("生成了" + contentType + "类型的文件");
+} else {
+    // 处理JSON响应（如错误信息）
+    String message = response.getString("message");
+    System.out.println("API返回: " + message);
+}
+```
+
 ### PUT/DELETE请求
 
 ```java
@@ -183,6 +211,85 @@ JSONObject response = HttpUtils.get("https://api.example.com/plain-text");
 // 原始内容在data字段中
 String plainText = response.getString("data");
 ```
+
+### 🔷 二进制响应处理
+
+HttpUtils提供了智能的二进制响应处理功能，能自动识别并处理图片、音频、视频、PDF等二进制内容。
+
+```java
+// 下载图片文件
+JSONObject headers = new JSONObject();
+headers.put("Authorization", "Bearer your-token");
+
+JSONObject response = HttpUtils.postForBinary("https://api.example.com/files/download", 
+                                             requestBody, headers);
+
+// 检查是否为二进制响应
+if (response.getBooleanValue("isBinary")) {
+    String contentType = response.getString("contentType");
+    Integer fileSize = response.getInteger("size");
+    String base64Data = response.getString("base64");
+    String dataUrl = response.getString("dataUrl");
+    
+    System.out.println("文件类型: " + contentType);
+    System.out.println("文件大小: " + fileSize + " 字节");
+    
+    // 可以直接使用dataUrl在HTML中显示
+    // <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...">
+    
+    // 或者将base64数据保存为文件
+    byte[] fileBytes = java.util.Base64.getDecoder().decode(base64Data);
+    java.nio.file.Files.write(java.nio.file.Paths.get("downloaded_file.png"), fileBytes);
+}
+```
+
+#### 支持的二进制文件类型
+
+- **图片文件**: `image/*` (PNG, JPEG, GIF, WebP等)
+- **音频文件**: `audio/*` (MP3, WAV, OGG等)  
+- **视频文件**: `video/*` (MP4, AVI, MOV等)
+- **PDF文档**: `application/pdf`
+- **通用二进制**: `application/octet-stream`
+- **其他包含"binary"关键字的内容类型**
+
+#### 智能响应识别
+
+HttpUtils会根据响应的`Content-Type`头自动判断是否为二进制内容：
+
+```java
+// 智能识别响应类型的通用方法
+JSONObject response = HttpUtils.requestForBinary("GET", 
+                                                "https://api.example.com/resource", 
+                                                headers, null, null);
+
+if (response.getBooleanValue("isBinary")) {
+    // 处理二进制数据
+    handleBinaryResponse(response);
+} else {
+    // 处理JSON数据
+    handleJsonResponse(response);
+}
+```
+
+#### 二进制响应数据结构
+
+二进制响应返回的JSONObject包含以下字段：
+
+```json
+{
+  "isBinary": true,
+  "contentType": "image/png",
+  "size": 15234,
+  "base64": "iVBORw0KGgoAAAANSUhEUgAA...",
+  "dataUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+}
+```
+
+- `isBinary`: 布尔值，标识这是二进制响应
+- `contentType`: 原始的Content-Type响应头
+- `size`: 文件大小（字节数）
+- `base64`: Base64编码的文件内容
+- `dataUrl`: 可直接用于HTML的Data URL格式
 
 ## ⚡ 实际应用示例
 

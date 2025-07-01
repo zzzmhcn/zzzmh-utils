@@ -79,6 +79,34 @@ headers.put("X-API-Key", "your-api-key");
 JSONObject response = HttpUtils.post("https://api.example.com/protected", userData, headers);
 ```
 
+### 🔷 Binary POST Requests
+
+```java
+// Request API that may return binary data
+JSONObject requestData = new JSONObject();
+requestData.put("fileId", "12345");
+requestData.put("format", "png");
+
+JSONObject headers = new JSONObject();
+headers.put("Authorization", "Bearer your-token");
+
+// Use postForBinary method to handle potential binary responses
+JSONObject response = HttpUtils.postForBinary("https://api.example.com/generate-image", 
+                                             requestData, headers);
+
+// Smart response handling
+if (response.getBooleanValue("isBinary")) {
+    // Handle binary response (e.g., generated image)
+    String base64Image = response.getString("base64");
+    String contentType = response.getString("contentType");
+    System.out.println("Generated " + contentType + " file");
+} else {
+    // Handle JSON response (e.g., error message)
+    String message = response.getString("message");
+    System.out.println("API returned: " + message);
+}
+```
+
 ### PUT/DELETE Requests
 
 ```java
@@ -129,6 +157,113 @@ JSONObject response = HttpUtils.request(
     proxy                              // Proxy configuration
 );
 ```
+
+## 🔄 Response Handling
+
+### Automatic JSON Parsing
+
+```java
+// Successful responses are automatically parsed as JSONObject
+JSONObject response = HttpUtils.get("https://api.example.com/user/123");
+
+// Access response data
+String userName = response.getString("name");
+Integer userAge = response.getInteger("age");
+JSONArray hobbies = response.getJSONArray("hobbies");
+
+// Handle nested objects
+JSONObject profile = response.getJSONObject("profile");
+String avatar = profile.getString("avatar");
+```
+
+### Non-JSON Response Handling
+
+```java
+// If response is not JSON format, it will be automatically wrapped
+JSONObject response = HttpUtils.get("https://api.example.com/plain-text");
+
+// Original content is in the data field
+String plainText = response.getString("data");
+```
+
+### 🔷 Binary Response Handling
+
+HttpUtils provides intelligent binary response handling that can automatically identify and process images, audio, video, PDF and other binary content.
+
+```java
+// Download image file
+JSONObject headers = new JSONObject();
+headers.put("Authorization", "Bearer your-token");
+
+JSONObject response = HttpUtils.postForBinary("https://api.example.com/files/download", 
+                                             requestBody, headers);
+
+// Check if it's a binary response
+if (response.getBooleanValue("isBinary")) {
+    String contentType = response.getString("contentType");
+    Integer fileSize = response.getInteger("size");
+    String base64Data = response.getString("base64");
+    String dataUrl = response.getString("dataUrl");
+    
+    System.out.println("File type: " + contentType);
+    System.out.println("File size: " + fileSize + " bytes");
+    
+    // Can directly use dataUrl in HTML
+    // <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...">
+    
+    // Or save base64 data as file
+    byte[] fileBytes = java.util.Base64.getDecoder().decode(base64Data);
+    java.nio.file.Files.write(java.nio.file.Paths.get("downloaded_file.png"), fileBytes);
+}
+```
+
+#### Supported Binary File Types
+
+- **Image files**: `image/*` (PNG, JPEG, GIF, WebP, etc.)
+- **Audio files**: `audio/*` (MP3, WAV, OGG, etc.)  
+- **Video files**: `video/*` (MP4, AVI, MOV, etc.)
+- **PDF documents**: `application/pdf`
+- **Generic binary**: `application/octet-stream`
+- **Other content types containing "binary" keyword**
+
+#### Smart Response Recognition
+
+HttpUtils automatically determines whether content is binary based on the `Content-Type` response header:
+
+```java
+// Generic method with smart response type recognition
+JSONObject response = HttpUtils.requestForBinary("GET", 
+                                                "https://api.example.com/resource", 
+                                                headers, null, null);
+
+if (response.getBooleanValue("isBinary")) {
+    // Handle binary data
+    handleBinaryResponse(response);
+} else {
+    // Handle JSON data
+    handleJsonResponse(response);
+}
+```
+
+#### Binary Response Data Structure
+
+Binary responses return a JSONObject with the following fields:
+
+```json
+{
+  "isBinary": true,
+  "contentType": "image/png",
+  "size": 15234,
+  "base64": "iVBORw0KGgoAAAANSUhEUgAA...",
+  "dataUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+}
+```
+
+- `isBinary`: Boolean value indicating this is a binary response
+- `contentType`: Original Content-Type response header
+- `size`: File size in bytes
+- `base64`: Base64-encoded file content
+- `dataUrl`: Data URL format ready for HTML use
 
 ## ⚙️ Configuration
 
