@@ -14,7 +14,7 @@ Add this dependency to your project:
 <dependency>
     <groupId>cn.zzzmh.commons</groupId>
     <artifactId>zzzmh-utils</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -72,7 +72,7 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 <dependency>
     <groupId>cn.zzzmh.commons</groupId>
     <artifactId>zzzmh-utils</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
